@@ -1,3 +1,2 @@
 gtts
-pygame
 streamlit
