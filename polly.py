@@ -1,16 +1,22 @@
+from io import BytesIO
+
 import streamlit as st
-import base64
+import pygame
 from gtts import gTTS
+
+
+def play_audio():
+    text = st.session_state.entered_text
+    mp3_file = BytesIO()
+    tts = gTTS(text=text, lang="en", slow=False)
+    tts.write_to_fp(mp3_file)
+    mp3_file.seek(0)
+    sound = pygame.mixer.Sound(mp3_file)
+    sound.play()
 
 
 if __name__ == "__main__":
     st.title("Text to speech")
-    text = st.text_area("Enter the speech text", key="entered_text")#on_change=play_converted_speech, key="entered_text")
-    if text:
-        text = st.session_state.entered_text
-        speech = next(gTTS(text=text, lang="en", slow=False).stream())
-        audio_base64 = base64.b64encode(speech).decode('utf-8')
-        audio_tag = f'<audio autoplay="true" src="data:audio/wav;base64,{audio_base64}">'
-        st.markdown(audio_tag, unsafe_allow_html=True)
-
-
+    pygame.init()
+    pygame.mixer.init()
+    text = st.text_area("Enter the speech text", on_change=play_audio, key="entered_text")
